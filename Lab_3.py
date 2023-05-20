@@ -10,32 +10,32 @@ import random
 K_test = 3  # Тестовые данные
 N_test = 10
 E_test = [
-    [9, 5, 1, 6, -3],
-    [1, 6, -5, -1, -4],
-    [-8, -2, -3, 7, 9],
-    [-7, 6, 0, -8, 4],
-    [-3, -9, -4, -1, -5]]
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1]]
 
 B_test = [
-    [-8, -7, 1, 1, 10],
-    [-1, 10, 5, -10, -6],
-    [1, 8, 0, 9, 5],
-    [2, 1, -8, -5, -1],
-    [-3, -6, 9, 7, -6]]
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1]]
 
 C_test = [
-    [5, 7, -1, -7, -6],
-    [2, 3, 10, -8, 4],
-    [-4, -7, -10, 15, 5],
-    [0, 9, -8, 9, 4],
-    [10, -8, -10, -1, 8]]
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 0, 1, 1],
+    [1, 1, 0, 1, 1]]
 
 D_test = [
-    [-7, 1, 7, 8, -3],
-    [-1, 6, -5, 2, 2],
-    [-4, -2, 1, -2, -2],
-    [2, -3, 0, -7, -1],
-    [-8, -10, 3, 0, -5]]
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1]]
 
 print('Использовать тестовые данные или случайные?')
 while True:
@@ -48,12 +48,12 @@ if choice == '1':
     K = K_test
     N = N_test
     B, C, D, E = B_test, C_test, D_test, E_test
-    n = N // 2  # Размерность матриц B, C, D, E (n x n)
+    n = N // 2   # Размерность матриц B, C, D, E (n x n)
 
 if choice == '2':  # Генерация случайных данных
     K = int(input("Введите число К="))
     while True:
-        N = int(input("Введите число N="))
+        N = int(input("Введите число n="))
         if N < 6:
             print('Число N слишком малое. Введите N >= 6')
         else:
@@ -64,7 +64,7 @@ if choice == '2':  # Генерация случайных данных
         row_b, row_c, row_d, row_e = [], [], [], []
         for col in range(n):
             row_b.append(random.randint(-10, 10))
-            row_c.append(random.randint(-10, 10))
+            row_c.append(random.randint(0, 1))
             row_d.append(random.randint(-10, 10))
             row_e.append(random.randint(-10, 10))
         B.append(row_b)
@@ -119,19 +119,29 @@ def issimple(n):
 
 # Считаем количество простых чисел в нечетных столбцах в области 2 в матрице C
 count_more_K = 0
-for row in range(1, n // 2 + 1):
-    for col in range(row, n - row):
-        if col % 2 == 1:  # Нумерация столбцов начинается с 1
-            if issimple(C[col][row * -1]):
-                count_more_K += 1  # Увеличиваем счетчик
+N = len(C)
+mid = N // 2
+is_even = N % 2 == 0
+for col in range(mid, N):
+    for row in range(0, N):
+        if is_even and (abs(col - mid) <= abs(mid - row) or abs(col - mid + 1) <= abs(mid - row))\
+                or not is_even and abs(col - mid) <= abs(mid - row):
+            if (col + 1) % 2 != 0:
+                if issimple(C[row][col]):
+                     count_more_K += 1
 
 # Считаем количество нулевых чисел в чётных строках в области 3 в матрице С
 count_more_1_K = 0
-for row in range(1, n//2+1):
-    for col in range(row, n-row):
-        if col % 2 == 0:  # Нумерация строк начинается с 1
-            if C[col][row-1] == 0:
-                count_more_1_K += 1  # Увеличиваем счетчик
+for row in range(mid, N):
+    for col in range(0, N):
+        if is_even and (abs(col - mid) <= abs(mid - row) or abs(col - mid + 1) <= abs(mid - row))\
+                or not is_even and abs(col - mid) <= abs(mid - row):
+            if (row + 1) % 2 == 0: # Нумерация строк начинается с 1
+                print(C[col][row],col,row)
+                if C[row][col] == 0:
+                    count_more_1_K += 1  # Увеличиваем счетчик
+print(count_more_1_K)
+exit()
 
 F = []  # Создаём матрицу F следующим образом
 if count_more_K > count_more_1_K:  # Если в C количество простых чисел в нечетных столбцах в области 2 больше,
